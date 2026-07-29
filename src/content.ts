@@ -42,7 +42,7 @@ export type GradientPreset = {
 export const navLinks: NavLink[] = [
   {
     label: "Download CV",
-    href: "/assets/GiacomoImpocoCV2025.pdf",
+    href: "/assets/GiacomoImpocoCV2026.pdf",
     newTab: true,
   },
   { label: "About", href: "#about" },
