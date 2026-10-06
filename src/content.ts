@@ -13,6 +13,7 @@ export type SocialLink = {
 export type Project = {
   title: string;
   image: string;
+  imagePosition?: string;
   github?: string;
   demo?: string;
   demoLabel?: string;
@@ -102,6 +103,7 @@ export const projects: Project[] = [
     image: "/assets/plink-banner.png",
     github: "https://github.com/gimpoco1/plink",
     demo: "https://plinkscore.com",
+    demoLabel: "Visit site",
     description:
       "A cross-platform scorekeeping experience for card, board, and party games. Plink combines fast live scoring with flexible game rules, session history, player and team insights, and a production-ready freemium platform across web and iOS.",
     productFeatures: [
@@ -129,22 +131,64 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    title: "Hecate - Explore the World",
+    image: "/assets/hecate.png",
+    imagePosition: "center 15%",
+    github: "https://github.com/gimpoco1/hecate",
+    demo: "https://hecate-eta.vercel.app/",
+    demoLabel: "Visit site",
+    description:
+      "A private map of the world you have personally discovered. Hecate reveals streets, neighbourhoods, and cities as you move through them, turning everyday journeys into a living record of exploration.",
+    productFeatures: [
+      "Live journey tracking",
+      "Personal discovery map",
+      "City exploration progress",
+      "Favourite places",
+      "Private cloud sync",
+    ],
+    featured: true,
+  },
+  {
     title: "Building Construction Company",
     image: "/assets/mpkbuildings.png",
     github: "https://github.com/gimpoco1/mpk-buildings",
     demo: "https://mpkbuildings.com/",
     demoLabel: "Visit site",
+    description:
+      "A polished company website that presents specialist building services, completed work, and a clear path for prospective clients to request a quote.",
+    productFeatures: [
+      "Service showcase",
+      "Project portfolio",
+      "Quote enquiries",
+    ],
   },
   {
     title: "E-commerce Marketplace",
     image: "/assets/marketplace.png",
     github: "https://github.com/gimpoco1/market-place",
     demo: "https://treasure-ireland.vercel.app/",
+    description:
+      "A complete online marketplace with product discovery, customer accounts, cart and checkout flows, plus order and catalogue tools for administrators.",
+    productFeatures: [
+      "Product discovery",
+      "Shopping cart",
+      "Customer accounts",
+      "Checkout",
+      "Admin dashboard",
+    ],
   },
   {
     title: "Level Up Game",
     image: "/assets/levelup.png",
     github: "https://github.com/gimpoco1/Level-Up",
+    description:
+      "A playful challenge app for discovering delightfully useless skills, tracking progress, and celebrating each completed milestone.",
+    productFeatures: [
+      "Interactive challenges",
+      "Progress tracking",
+      "Milestone animations",
+      "Responsive experience",
+    ],
   },
 ];
 

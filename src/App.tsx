@@ -154,9 +154,9 @@ const App = () => {
         <Content>
           <Hero experienceYears={experienceYears} />
           <About />
+          <Projects />
           <AIWorkflow />
           <Skills />
-          <Projects />
           <Education />
         </Content>
       </Frame>

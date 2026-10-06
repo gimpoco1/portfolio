@@ -1,501 +1,436 @@
 import styled from "@emotion/styled";
-import React, { useCallback } from "react";
-import { projects, type Project } from "../content";
+import { useCallback, useRef, useState } from "react";
+import { projects } from "../content";
+import { Card, CardSwap, type CardSwapHandle } from "./CardSwap";
 import { FeatureCard, FeatureHeader, PillLabel } from "./CommonStyles";
 
-export const Projects = () => (
-  <FeatureCard id="projects">
-    <FeatureHeader>
-      <PillLabel>After Hours Projects</PillLabel>
-    </FeatureHeader>
-    {projects
-      .filter((project) => project.featured)
-      .map((project) => (
-        <FeaturedProjectCard key={project.title} project={project} />
-      ))}
-    <ProjectsGrid>
-      {projects
-        .filter((project) => !project.featured)
-        .map((project) => (
-          <ProjectCard key={project.title} project={project} />
-        ))}
-    </ProjectsGrid>
-  </FeatureCard>
-);
+export const Projects = () => {
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+  const cardSwapRef = useRef<CardSwapHandle>(null);
+  const activeProject = projects[activeProjectIndex];
+  const handleActiveProjectChange = useCallback((index: number) => {
+    setActiveProjectIndex(index);
+  }, []);
+  const showPreviousProject = useCallback(() => {
+    if (!cardSwapRef.current) {
+      throw new Error("Project card navigation is not ready.");
+    }
+    cardSwapRef.current.showPrevious();
+  }, []);
+  const showNextProject = useCallback(() => {
+    if (!cardSwapRef.current) {
+      throw new Error("Project card navigation is not ready.");
+    }
+    cardSwapRef.current.showNext();
+  }, []);
 
-const ProjectsGrid = styled.div`
+  return (
+    <ProjectsSection id="projects">
+      <ProjectsCopy>
+        <ProjectsFeatureHeader>
+          <ProjectsPillLabel>Selected Projects</ProjectsPillLabel>
+        </ProjectsFeatureHeader>
+        <Eyebrow>
+          {String(activeProjectIndex + 1).padStart(2, "0")} /{" "}
+          {String(projects.length).padStart(2, "0")}
+        </Eyebrow>
+        <h2>{activeProject.title}</h2>
+        {activeProject.description && (
+          <Description>{activeProject.description}</Description>
+        )}
+        {activeProject.productFeatures && (
+          <FeatureList aria-label={`${activeProject.title} highlights`}>
+            {activeProject.productFeatures.slice(0, 5).map((feature) => (
+              <li key={feature}>{feature}</li>
+            ))}
+          </FeatureList>
+        )}
+        <NavigationRow>
+          <Hint>
+            Click a card or use the arrows to navigate. Hover over the cards to pause.
+          </Hint>
+          <NavigationButtons>
+            <NavigationButton
+              type="button"
+              onClick={showPreviousProject}
+              aria-label="Show previous project"
+            >
+              ←
+            </NavigationButton>
+            <NavigationButton
+              type="button"
+              onClick={showNextProject}
+              aria-label="Show next project"
+            >
+              →
+            </NavigationButton>
+          </NavigationButtons>
+        </NavigationRow>
+      </ProjectsCopy>
+
+      <StackViewport>
+        <StackScale>
+          <CardSwap
+            ref={cardSwapRef}
+            width={500}
+            height={390}
+            cardDistance={28}
+            verticalDistance={34}
+            delay={4600}
+            skewAmount={4}
+            onActiveCardChange={handleActiveProjectChange}
+          >
+            {projects.map((project, index) => (
+              <ProjectCard key={project.title} aria-label={project.title}>
+                <CardHeader>
+                  <CardIndex>{String(index + 1).padStart(2, "0")}</CardIndex>
+                  <strong>{project.title}</strong>
+                  <CardDot />
+                </CardHeader>
+                <CardImage>
+                  <img
+                    src={project.image}
+                    alt={`${project.title} preview`}
+                    style={{ objectPosition: project.imagePosition }}
+                  />
+                </CardImage>
+                <CardFooter>
+                  <span>{project.featured ? "Featured product" : "Selected project"}</span>
+                  <CardLinks>
+                    {project.demo && (
+                      <a href={project.demo} target="_blank" rel="noreferrer">
+                        {project.demoLabel ?? "Live demo"} ↗
+                      </a>
+                    )}
+                    {project.github && (
+                      <a href={project.github} target="_blank" rel="noreferrer">
+                        Code ↗
+                      </a>
+                    )}
+                  </CardLinks>
+                </CardFooter>
+              </ProjectCard>
+            ))}
+          </CardSwap>
+        </StackScale>
+      </StackViewport>
+    </ProjectsSection>
+  );
+};
+
+const ProjectsSection = styled(FeatureCard)`
+  z-index: 2;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  grid-auto-rows: 1fr;
-  align-items: stretch;
-  position: relative;
-  z-index: 1;
+  grid-template-columns: minmax(300px, 0.78fr) minmax(560px, 1.22fr);
+  height: 650px;
+  margin-bottom: 50px;
+  padding: clamp(26px, 4vw, 48px);
+  overflow: visible;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 540px minmax(0, 1fr);
+    height: 1050px;
+    margin-bottom: 110px;
+    overflow: visible;
+  }
+
+  @media (max-width: 560px) {
+    grid-template-rows: 660px minmax(0, 1fr);
+    height: 1110px;
+    margin-bottom: 90px;
+    padding: 22px 18px;
+  }
 `;
 
-const FeaturedCard = styled.article`
+const ProjectsCopy = styled.div`
   position: relative;
-  z-index: 1;
-  margin-bottom: 16px;
-  border-radius: 23px;
-  padding: 12px;
-  overflow: hidden;
-  isolation: isolate;
-  background: linear-gradient(
-      130deg,
-      rgba(255, 255, 255, 0.12),
-      rgba(255, 255, 255, 0.04)
-    ),
-    rgba(12, 10, 22, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
-  transition: transform 220ms ease, border-color 220ms ease,
-    box-shadow 220ms ease;
-  --x: 50%;
-  --y: 50%;
+  z-index: 3;
+  display: grid;
+  grid-template-rows: auto 18px 160px 130px 115px 38px;
+  align-content: center;
+  min-width: 0;
+  padding-right: clamp(12px, 3vw, 40px);
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    background: radial-gradient(
-      600px circle at var(--x) var(--y),
-      rgba(255, 255, 255, 0.18),
-      transparent 56%
-    );
-    opacity: 0;
-    transition: opacity 260ms ease;
-    pointer-events: none;
-    z-index: 0;
+  h2 {
+    align-self: center;
+    margin: 0;
+    max-width: 430px;
+    max-height: 3em;
+    overflow: hidden;
+    color: var(--text);
+    font-size: clamp(34px, 4vw, 54px);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
   }
+
+  @media (max-width: 980px) {
+    display: block;
+    padding-right: 0;
+    padding-bottom: 72px;
+
+    h2 {
+      max-width: 680px;
+      max-height: none;
+      margin: 12px 0 18px;
+      font-size: clamp(38px, 7vw, 56px);
+    }
+  }
+`;
+
+const ProjectsFeatureHeader = styled(FeatureHeader)`
+  margin-bottom: 28px;
+`;
+
+const ProjectsPillLabel = styled(PillLabel)`
+  margin-bottom: 0;
+`;
+
+const Eyebrow = styled.span`
+  align-self: end;
+  color: #dfff42;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+
+  @media (max-width: 980px) {
+    display: block;
+  }
+`;
+
+const Description = styled.p`
+  max-width: 470px;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+
+  @media (max-width: 980px) {
+    max-width: 680px;
+    height: auto;
+  }
+`;
+
+const FeatureList = styled.ul`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-content: flex-start;
+  max-width: 460px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+
+  @media (max-width: 980px) {
+    max-width: 680px;
+    height: auto;
+    margin-top: 20px;
+    overflow: visible;
+  }
+
+  li {
+    padding: 7px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    font-weight: 650;
+  }
+`;
+
+const Hint = styled.span`
+  max-width: 245px;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 11px;
+  line-height: 1.4;
+`;
+
+const NavigationRow = styled.div`
+  display: flex;
+  align-items: center;
+  align-self: end;
+  gap: 16px;
+
+  @media (max-width: 980px) {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+  }
+`;
+
+const NavigationButtons = styled.div`
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+`;
+
+const NavigationButton = styled.button`
+  display: grid;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease,
+    background 180ms ease;
 
   &:hover {
-    transform: translateY(-3px);
-    border-color: rgba(255, 255, 255, 0.38);
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.12);
   }
 
-  &:hover::before {
-    opacity: 1;
+  &:focus-visible {
+    outline: 2px solid #8cdcff;
+    outline-offset: 2px;
   }
 `;
 
-const FeaturedBanner = styled.div`
+const StackViewport = styled.div`
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  min-width: 0;
+  min-height: 550px;
+  overflow: visible;
+
+  @media (max-width: 980px) {
+    min-height: 520px;
+  }
+
+  @media (max-width: 560px) {
+    min-height: 390px;
+  }
+`;
+
+const StackScale = styled.div`
+  position: absolute;
+  right: 62px;
+  bottom: 34px;
+  width: 500px;
+  height: 390px;
+
+  @media (max-width: 980px) {
+    right: 50%;
+    bottom: 10px;
+    transform: translateX(46%) scale(0.92);
+    transform-origin: bottom center;
+  }
+
+  @media (max-width: 560px) {
+    bottom: 20px;
+    transform: translateX(46%) scale(0.64);
+  }
+`;
+
+const ProjectCard = styled(Card)`
+  display: grid;
+  grid-template-rows: 54px minmax(0, 1fr) 62px;
   overflow: hidden;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 22px;
+  background: #111019;
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  &:hover img {
+    transform: scale(1.035);
+  }
+`;
+
+const CardHeader = styled.div`
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.035);
+
+  strong {
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+const CardIndex = styled.span`
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+`;
+
+const CardDot = styled.span`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dfff42;
+  box-shadow: 0 0 14px rgba(223, 255, 66, 0.7);
+`;
+
+const CardImage = styled.div`
+  min-height: 0;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
 
   img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    object-fit: cover;
+    transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
+
 `;
 
-const FeaturedContent = styled.div`
-  position: relative;
-  z-index: 1;
-  padding: 22px 16px 14px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
-  gap: 26px;
-
-  @media (max-width: 760px) {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 18px 10px 10px;
-  }
-`;
-
-const FeaturedIntro = styled.div`
-  min-width: 0;
-
-  h3 {
-    margin: 4px 0 10px;
-    color: var(--text);
-    font-size: clamp(22px, 3vw, 30px);
-    letter-spacing: -0.03em;
-  }
-
-  p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 15px;
-    line-height: 1.65;
-  }
-`;
-
-const ProjectKicker = styled.span`
-  display: inline-flex;
+const CardFooter = styled.div`
+  display: flex;
   align-items: center;
-  gap: 7px;
-  color: #dcff37;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 17px;
+  background: #111019;
 
-  &::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-    box-shadow: 0 0 16px rgba(220, 255, 55, 0.8);
-  }
-`;
-
-const FeatureGroup = styled.div`
-  margin-top: 20px;
-
-  h4 {
-    margin: 0 0 10px;
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 11px;
-    letter-spacing: 0.12em;
+  > span {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
   }
 `;
 
-const EngineeringFeatureGroup = styled(FeatureGroup)`
-  margin-top: 0;
-`;
-
-const FeatureChips = styled.ul`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-`;
-
-const FeatureChip = styled.li`
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.055);
-  color: rgba(255, 255, 255, 0.84);
-  font-size: 12px;
-  font-weight: 650;
-`;
-
-const EngineeringPanel = styled.div`
-  align-self: stretch;
-  padding: 17px;
-  border-radius: 17px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-`;
-
-const FeaturedLinks = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-`;
-
-const SpotlightCard = styled.article`
-  position: relative;
-  border-radius: 23px;
-  padding: 12px;
-  background: linear-gradient(
-      130deg,
-      rgba(255, 255, 255, 0.12),
-      rgba(255, 255, 255, 0.04)
-    ),
-    rgba(12, 10, 22, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-  isolation: isolate;
-  backdrop-filter: blur(2px);
-  transition: transform 220ms ease, border-color 220ms ease,
-    box-shadow 220ms ease, background 220ms ease;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 260px;
-  --x: 50%;
-  --y: 50%;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    background: radial-gradient(
-      480px circle at var(--x) var(--y),
-      rgba(255, 255, 255, 0.18),
-      transparent 52%
-    );
-    opacity: 0;
-    transition: opacity 260ms ease;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: conic-gradient(
-      from 120deg,
-      rgba(255, 78, 146, 0.3),
-      rgba(14, 190, 255, 0.35),
-      rgba(255, 182, 0, 0.3),
-      rgba(255, 78, 146, 0.3)
-    );
-    opacity: 0.24;
-    filter: blur(26px);
-    transform: scale(1.2);
-    z-index: 0;
-  }
-
-  &:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.38);
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
-  }
-
-  &:hover::before {
-    opacity: 1;
-  }
-
-  &:hover img {
-    transform: scale(1.04);
-  }
-`;
-
-const CardBody = styled.div`
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 100%;
-  flex: 1;
-`;
-
-const ProjectThumb = styled.div`
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  aspect-ratio: 16 / 14;
-  min-height: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 260ms ease;
-  }
-`;
-
-const ProjectTitle = styled.div`
+const CardLinks = styled.div`
   display: flex;
   align-items: center;
-  text-align: center;
-  width: 100%;
-  flex-direction: column;
-  gap: 1px;
+  gap: 7px;
 
-  h4 {
-    margin: 4px 0 16px;
-    font-size: 16px;
-    color: var(--text);
+  a {
+    padding: 7px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.055);
+    font-size: 11px;
+    font-weight: 750;
+    transition: border-color 180ms ease, background 180ms ease;
+  }
+
+  a:hover,
+  a:focus-visible {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.11);
   }
 `;
-
-const ProjectLinks = styled.div`
-  display: flex;
-  gap: 14px;
-  flex-wrap: nowrap;
-  margin-top: auto;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-`;
-
-const LinkButton = styled.a`
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: radial-gradient(
-    circle at 20% 20%,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.06)
-  );
-  color: var(--text);
-  font-weight: 700;
-  font-size: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 10px 30px rgba(0, 0, 0, 0.35);
-  transition: transform 180ms ease, background 180ms ease,
-    border-color 180ms ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-
-  &:hover {
-    transform: translateY(-1px);
-    background: radial-gradient(
-      circle at 20% 20%,
-      rgba(255, 255, 255, 0.26),
-      rgba(255, 255, 255, 0.12)
-    );
-    border-color: rgba(255, 255, 255, 0.38);
-  }
-`;
-
-const SiteLinkButton = styled(LinkButton)`
-  background: linear-gradient(
-    135deg,
-    rgba(14, 190, 255, 0.34),
-    rgba(120, 92, 255, 0.34)
-  );
-  border-color: rgba(113, 216, 255, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    0 10px 30px rgba(14, 190, 255, 0.14);
-
-  &:hover {
-    background: linear-gradient(
-      135deg,
-      rgba(14, 190, 255, 0.48),
-      rgba(120, 92, 255, 0.48)
-    );
-    border-color: rgba(154, 230, 255, 0.72);
-  }
-`;
-
-const CodeIcon = styled.svg`
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-`;
-
-const ViewCodeIcon = () => (
-  <CodeIcon
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="m8 9-3 3 3 3" />
-    <path d="m16 9 3 3-3 3" />
-    <path d="m14 5-4 14" />
-  </CodeIcon>
-);
-
-const getSpotlightPosition = (event: React.MouseEvent<HTMLElement>) => {
-  const { currentTarget } = event;
-  const rect = currentTarget.getBoundingClientRect();
-  const x = ((event.clientX - rect.left) / rect.width) * 100;
-  const y = ((event.clientY - rect.top) / rect.height) * 100;
-  currentTarget.style.setProperty("--x", `${x}%`);
-  currentTarget.style.setProperty("--y", `${y}%`);
-};
-
-const FeaturedProjectCard = ({ project }: { project: Project }) => {
-  const handleSpotlight = useCallback(getSpotlightPosition, []);
-
-  return (
-    <FeaturedCard onMouseMove={handleSpotlight}>
-      <FeaturedBanner>
-        <img src={project.image} alt="Plink score tracker product banner" />
-      </FeaturedBanner>
-      <FeaturedContent>
-        <FeaturedIntro>
-          <ProjectKicker>Featured product</ProjectKicker>
-          <h3>{project.title}</h3>
-          {project.description && <p>{project.description}</p>}
-          {project.productFeatures && (
-            <FeatureGroup>
-              <h4>Product experience</h4>
-              <FeatureChips>
-                {project.productFeatures.map((feature) => (
-                  <FeatureChip key={feature}>{feature}</FeatureChip>
-                ))}
-              </FeatureChips>
-            </FeatureGroup>
-          )}
-        </FeaturedIntro>
-        <EngineeringPanel>
-          {project.technicalFeatures && (
-            <EngineeringFeatureGroup>
-              <h4>Engineering highlights</h4>
-              <FeatureChips>
-                {project.technicalFeatures.map((feature) => (
-                  <FeatureChip key={feature}>{feature}</FeatureChip>
-                ))}
-              </FeatureChips>
-            </EngineeringFeatureGroup>
-          )}
-          <FeaturedLinks>
-            {project.demo && (
-              <SiteLinkButton
-                href={project.demo}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Visit Plink ↗
-              </SiteLinkButton>
-            )}
-            {project.github && (
-              <LinkButton href={project.github} target="_blank" rel="noreferrer">
-                <ViewCodeIcon />
-                View code
-              </LinkButton>
-            )}
-          </FeaturedLinks>
-        </EngineeringPanel>
-      </FeaturedContent>
-    </FeaturedCard>
-  );
-};
-
-const ProjectCard = ({ project }: { project: Project }) => {
-  const handleSpotlight = useCallback(getSpotlightPosition, []);
-
-  return (
-    <SpotlightCard onMouseMove={handleSpotlight}>
-      <CardBody>
-        <ProjectThumb>
-          <img src={project.image} alt={project.title} loading="lazy" />
-        </ProjectThumb>
-        <ProjectTitle>
-          <h4>{project.title}</h4>
-        </ProjectTitle>
-        <ProjectLinks>
-          {project.demo && (
-            <SiteLinkButton
-              href={project.demo}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {project.demoLabel ?? "Live demo"} ↗
-            </SiteLinkButton>
-          )}
-          {project.github && (
-            <LinkButton href={project.github} target="_blank" rel="noreferrer">
-              <ViewCodeIcon />
-              View code
-            </LinkButton>
-          )}
-        </ProjectLinks>
-      </CardBody>
-    </SpotlightCard>
-  );
-};
