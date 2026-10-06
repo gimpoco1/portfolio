@@ -1,25 +1,15 @@
-# My Portfolio
+# Giacomo Impoco - Portfolio
 
-Hey there! This cozy corner of the internet is my personal portfolio, packed with projects, experiments, and all the things that keep me curious. Wander around, enjoy the vibes, and get to know what I have been building.
+Welcome! This is my little corner of the internet. A place where I share what I have been building, what I care about, and what I am curious to explore next.
 
-## Say Hello
+Inside, you will find a selection of my projects, a little about the path that brought me into software, and a look at the ideas and skills I am currently developing.
 
-- LinkedIn: https://www.linkedin.com/in/giacomoimpoco/
-- GitHub: https://github.com/gimpoco1
-- Email: impoco126@gmail.com
+I made this portfolio to be explored, so feel free to click around, move through the projects, and discover the details along the way.
 
-I am always open to collaborate-whether it is a wild idea, a polished product, or a weekend hack, I am game. Drop me a message and let us cook up something fun together!
+## Let’s connect
 
-## Live GitHub activity
+- [LinkedIn](https://www.linkedin.com/in/giacomoimpoco/)
+- [GitHub](https://github.com/gimpoco1)
+- [Email](mailto:impoco126@gmail.com)
 
-The hero loads the latest 12 months of public and anonymized private contribution
-data through the Netlify Function at `/api/github-contributions`. Private
-repository names and other details are never requested or exposed, and no
-GitHub token is required.
-
-For private activity to appear, enable **Private contributions** from the
-**Contribution settings** menu above the contribution calendar on your GitHub
-profile. Successful responses are cached by Netlify for one hour.
-
-To run the function locally, use `npx netlify dev`; the regular Vite server
-displays the GitHub fallback state instead.
+If you have an interesting idea, want to work together, or simply feel like saying hello, I would love to hear from you.
