@@ -42,13 +42,13 @@ export type GradientPreset = {
 
 export const navLinks: NavLink[] = [
   {
-    label: "Download CV",
+    label: "Show CV",
     href: "/assets/GiacomoImpocoCV2026.pdf",
     newTab: true,
   },
   { label: "About", href: "#about" },
-  { label: "Skills", href: "#experience" },
   { label: "Projects", href: "#projects" },
+  { label: "Skills", href: "#experience" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -149,13 +149,13 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    title: "Building Construction Company",
+    title: "Mpk Buildings",
     image: "/assets/mpkbuildings.png",
     github: "https://github.com/gimpoco1/mpk-buildings",
     demo: "https://mpkbuildings.com/",
     demoLabel: "Visit site",
     description:
-      "A polished company website that presents specialist building services, completed work, and a clear path for prospective clients to request a quote.",
+      "A company website that presents specialist building services, completed work, and a clear path for prospective clients to request a quote.",
     productFeatures: [
       "Service showcase",
       "Project portfolio",
@@ -178,7 +178,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: "Level Up Game",
+    title: "Level Up",
     image: "/assets/levelup.png",
     github: "https://github.com/gimpoco1/Level-Up",
     description:
@@ -196,9 +196,16 @@ export const experienceStartYear = 2022;
 
 export const education: EducationEntry[] = [
   {
+    title: "AI Integration & Applied AI Engineering",
+    issuer: "Independent learning and product experimentation",
+    year: "2025",
+    summary:
+      "Constantly exploring AI integration, LLM APIs, agentic workflows, retrieval, evaluation, and practical ways to build reliable AI-powered product experiences.",
+  },
+  {
     title: "Full-Stack Web Development Bootcamp",
     issuer: "Codeworks",
-    year: "2024",
+    year: "2023",
     summary:
       "Completed an intensive full-stack web development bootcamp focusing on modern web technologies and best practices.",
   },
@@ -212,7 +219,7 @@ export const education: EducationEntry[] = [
   {
     title: "AWS Cloud Practitioner Essentials",
     issuer: "Coursera",
-    year: "2023",
+    year: "2022",
     summary:
       "Gained foundational knowledge of AWS cloud concepts, services, and best practices.",
   },

@@ -14,8 +14,8 @@ const GlowAccent = styled.div`
   width: 6px;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(180deg, #ff6347, #ffc857, #57ebff);
-  filter: drop-shadow(0 0 16px rgba(255, 155, 245, 0.7));
+  background: linear-gradient(180deg, #6b21a8, #a855f7, #d8b4fe, #ffffff);
+  filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.7));
 `;
 
 const AboutCopy = styled.div`

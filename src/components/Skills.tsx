@@ -1,28 +1,7 @@
 import styled from "@emotion/styled";
 import { techStack } from "../content";
 import { FeatureCard, FeatureHeader, PillLabel } from "./CommonStyles";
-
-export const Skills = () => (
-  <FeatureCard id="experience">
-    <FeatureHeader>
-      <PillLabel>What I build with</PillLabel>
-    </FeatureHeader>
-    <TechGrid>
-      {techStack.map((skill) => (
-        <TechCard key={skill}>
-          <TechIcon>
-            <img
-              src={iconForSkill(skill)}
-              alt={`${skill} icon`}
-              className={lightIconSkills.has(skill) ? "light-icon" : undefined}
-            />
-          </TechIcon>
-          <TechLabel>{skill}</TechLabel>
-        </TechCard>
-      ))}
-    </TechGrid>
-  </FeatureCard>
-);
+import { InfiniteSpiral } from "./InfiniteSpiral";
 
 const iconSlugs: Record<string, string> = {
   HTML: "html5",
@@ -45,6 +24,7 @@ const iconSlugs: Record<string, string> = {
   Django: "django",
   Docker: "docker",
   Vite: "vite",
+  Figma: "figma",
   iOS: "apple",
   Swift: "swift",
   Capacitor: "capacitor",
@@ -55,92 +35,181 @@ const iconSlugs: Record<string, string> = {
   "Three.js": "threedotjs",
 };
 
-const iconForSkill = (skill: string) => {
-  const slug =
-    iconSlugs[skill] ??
-    skill
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+const lightIconSkills = new Set(["iOS", "Apple StoreKit", "Three.js"]);
+
+const iconForSkill = (skill: string): string => {
+  const slug = iconSlugs[skill];
+
+  if (!slug) {
+    throw new Error(`No icon slug is configured for technology "${skill}".`);
+  }
+
   return `https://cdn.simpleicons.org/${slug}`;
 };
 
-const lightIconSkills = new Set(["iOS", "Apple StoreKit", "Three.js"]);
+const skillItem = (skill: string) => (
+  <TechItem aria-label={skill}>
+    <TechIcon>
+      <img
+        src={iconForSkill(skill)}
+        alt=""
+        className={lightIconSkills.has(skill) ? "light-icon" : undefined}
+        draggable={false}
+      />
+    </TechIcon>
+    <TechLabel>{skill}</TechLabel>
+  </TechItem>
+);
 
-const StackSubtitle = styled.p`
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1.5;
-  position: relative;
-  z-index: 1;
-`;
+export const Skills = () => (
+  <SkillsSection id="experience">
+    <SkillsHeader>
+      <FeatureHeader>
+        <PillLabel>What I build with</PillLabel>
+      </FeatureHeader>
+    </SkillsHeader>
+    <SpiralStage>
+      <InfiniteSpiral items={techStack.map(skillItem)} />
+    </SpiralStage>
+  </SkillsSection>
+);
 
-const TechGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 2fr));
-  gap: 12px;
-  margin-top: 10px;
-  position: relative;
-  z-index: 1;
-`;
-
-const TechCard = styled.div`
-  position: relative;
-  border-radius: 18px;
-  padding: 18px 14px;
-  min-height: 90px;
-  background: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.16),
-      rgba(255, 255, 255, 0.07)
-    ),
-    rgba(18, 16, 28, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  transition: transform 0.18s ease, box-shadow 0.18s ease,
-    border-color 0.18s ease;
+const SkillsSection = styled(FeatureCard)`
+  padding: 0;
   overflow: hidden;
 
+  @media (max-width: 620px) {
+    border-radius: 22px;
+  }
+`;
+
+const SkillsHeader = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  padding: clamp(22px, 3vw, 34px);
+  padding-bottom: 0;
+
+  @media (max-width: 620px) {
+    flex-direction: column;
+    gap: 0;
+    padding: 18px 16px 0;
+  }
+`;
+
+const SpiralStage = styled.div`
+  position: relative;
+  z-index: 1;
+
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+
+  &::before,
   &::after {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: 18px;
-    background: linear-gradient(
-      135deg,
-      rgba(120, 92, 255, 0.4),
-      rgba(87, 235, 255, 0.35)
-    );
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: 0;
+    right: 0;
+    left: 0;
+    z-index: 200000;
+    height: 92px;
     pointer-events: none;
+    backdrop-filter: blur(8px);
   }
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.16);
+  @media (max-width: 620px) {
+    &::before,
+    &::after {
+      height: 72px;
+    }
   }
 
-  &:hover::after {
-    opacity: 0.12;
+  &::before {
+    top: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(6, 5, 12, 0.82),
+      rgba(6, 5, 12, 0)
+    );
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+    mask-image: linear-gradient(to bottom, black, transparent);
   }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(
+      to top,
+      rgba(6, 5, 12, 0.82),
+      rgba(6, 5, 12, 0)
+    );
+    -webkit-mask-image: linear-gradient(to top, black, transparent);
+    mask-image: linear-gradient(to top, black, transparent);
+  }
+
+  .infinite-spiral {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  @media (max-width: 620px) {
+    .infinite-spiral {
+      height: 370px;
+    }
+  }
+
+  .infinite-spiral-stage {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .infinite-spiral-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 104px;
+    height: 88px;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, opacity, filter;
+  }
+
+`;
+
+const TechItem = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 9px 8px 7px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 17px;
+  background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.05)
+    ),
+    rgba(18, 16, 28, 0.94);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  user-select: none;
 `;
 
 const TechIcon = styled.div`
-  width: 38px;
-  height: 38px;
   display: grid;
+  width: 36px;
+  height: 36px;
   place-items: center;
-  z-index: 1;
 
   img {
     width: 100%;
@@ -153,15 +222,14 @@ const TechIcon = styled.div`
   }
 `;
 
-const TechLabel = styled.div`
-  z-index: 1;
+const TechLabel = styled.span`
+  display: grid;
   width: 100%;
   min-height: 20px;
-  margin-top: auto;
-  display: grid;
-  place-items: end center;
+  place-items: center;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.05;
   text-align: center;
-  line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.01em;
 `;

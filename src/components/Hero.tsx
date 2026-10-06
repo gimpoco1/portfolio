@@ -78,7 +78,7 @@ export const Hero = ({ experienceYears }: { experienceYears: number }) => {
           <HeadingAccent>simple, fast, and genuinely useful.</HeadingAccent>
         </HeroHeading>
         <HeroSummary>
-          Full-stack developer creating polished web and iOS experiences-from
+          Full-stack developer creating polished web and mobile experiences. From
           interface to infrastructure.
         </HeroSummary>
         <HeroActions>
@@ -157,7 +157,7 @@ export const Hero = ({ experienceYears }: { experienceYears: number }) => {
         </ActivityFooter>
       </ActivityCard>
 
-      <Eyebrow>Full-Stack Developer · {experienceYears}+ years</Eyebrow>
+      <Eyebrow>Software Development · {experienceYears}+ years</Eyebrow>
     </HeroSection>
   );
 };

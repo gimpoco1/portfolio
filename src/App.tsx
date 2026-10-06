@@ -9,7 +9,7 @@ import { Skills } from "./components/Skills";
 import { Projects } from "./components/Projects";
 import { Education } from "./components/Education";
 import { Footer } from "./components/Footer";
-import LiquidEther from "./components/LiquidEther";
+import MicroSlats from "./components/MicroSlats";
 import { useState, useEffect } from "react";
 
 const globalStyles = css`
@@ -43,6 +43,12 @@ const globalStyles = css`
     color: var(--text);
   }
 
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
   a {
     color: inherit;
     text-decoration: none;
@@ -57,12 +63,6 @@ const globalStyles = css`
     scroll-margin-top: 112px;
   }
 
-  .liquid-ether-container {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    pointer-events: none;
-  }
 `;
 
 const Page = styled.div`
@@ -127,24 +127,34 @@ const App = () => {
           pointerEvents: "none",
         }}
       >
-        <LiquidEther
-          style={{ width: "100%", height: "100%" }}
-          colors={["#ff4e92", "#ffb600", "#0ebeff"]}
-          mouseForce={40}
-          className="color-bends-overlay"
-          cursorSize={100}
-          isViscous={false}
-          viscous={30}
-          iterationsViscous={32}
-          iterationsPoisson={32}
-          resolution={0.5}
-          isBounce={false}
-          autoDemo={true}
-          autoSpeed={0.5}
-          autoIntensity={2.2}
-          takeoverDuration={0.25}
-          autoResumeDelay={500}
-          autoRampDuration={0.6}
+        <MicroSlats
+          preset="swell"
+          backgroundColor="#06030d"
+          color="#A855F7"
+          glintColor="#ffffff"
+          gap={3}
+          interactive={true}
+          slatHeight={25}
+          slatWidth={10}
+          roundness={0.75}
+          scale={1.5}
+          speed={0.6}
+          direction={250}
+          chop={0.55}
+          stretch={0}
+          glint={0.7}
+          contrast={1.25}
+          perspective={0.55}
+          fog={0.55}
+          cursorStrength={1}
+          cursorSize={40}
+          swirl={0}
+          trail={1.4}
+          lean={0}
+          intro={true}
+          introDuration={1.5}
+          paused={false}
+          style={{ width: "100%", height: "100%", display: "block" }}
         />
       </div>
       <Frame>

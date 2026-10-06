@@ -132,14 +132,16 @@ const ProjectsSection = styled(FeatureCard)`
     grid-template-rows: 540px minmax(0, 1fr);
     height: 1050px;
     margin-bottom: 110px;
+    padding: 22px;
     overflow: visible;
   }
 
   @media (max-width: 560px) {
-    grid-template-rows: 660px minmax(0, 1fr);
-    height: 1110px;
+    display: flex;
+    height: auto;
+    flex-direction: column;
     margin-bottom: 90px;
-    padding: 22px 18px;
+    padding: 14px 16px;
   }
 `;
 
@@ -175,6 +177,10 @@ const ProjectsCopy = styled.div`
       margin: 12px 0 18px;
       font-size: clamp(38px, 7vw, 56px);
     }
+  }
+
+  @media (max-width: 560px) {
+    padding-bottom: 0;
   }
 `;
 
@@ -261,6 +267,11 @@ const NavigationRow = styled.div`
     bottom: 20px;
     left: 0;
   }
+
+  @media (max-width: 560px) {
+    position: static;
+    margin-top: 28px;
+  }
 `;
 
 const NavigationButtons = styled.div`
@@ -308,6 +319,7 @@ const StackViewport = styled.div`
   }
 
   @media (max-width: 560px) {
+    height: 390px;
     min-height: 390px;
   }
 `;
