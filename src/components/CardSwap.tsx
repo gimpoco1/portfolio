@@ -33,6 +33,7 @@ type CardSwapProps = {
   delay: number;
   skewAmount: number;
   children: ReactNode;
+  visibilityTargetRef: RefObject<HTMLElement | null>;
   onActiveCardChange: (index: number) => void;
 };
 
@@ -100,6 +101,7 @@ export const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>((props, ref) =
     delay,
     skewAmount,
     children,
+    visibilityTargetRef,
     onActiveCardChange,
   } = props;
   const childElements = useMemo(() => {
@@ -122,6 +124,7 @@ export const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>((props, ref) =
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const intervalRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isProjectSectionVisibleRef = useRef(false);
   const activateCardRef = useRef<(index: number) => void>(() => undefined);
   const restartIntervalRef = useRef<() => void>(() => undefined);
 
@@ -291,6 +294,20 @@ export const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>((props, ref) =
       }
     };
     const resumeAnimation = (): void => {
+      const container = containerRef.current;
+
+      if (!container) {
+        throw new Error("Card Swap container was not mounted.");
+      }
+
+      const hasFocus = container.contains(document.activeElement);
+      if (
+        !isProjectSectionVisibleRef.current ||
+        container.matches(":hover") ||
+        hasFocus
+      ) {
+        return;
+      }
       timelineRef.current?.play();
       startInterval();
     };
@@ -302,13 +319,36 @@ export const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>((props, ref) =
 
     restartIntervalRef.current = () => {
       const hasFocus = container.contains(document.activeElement);
-      if (!container.matches(":hover") && !hasFocus) {
+      if (
+        isProjectSectionVisibleRef.current &&
+        !container.matches(":hover") &&
+        !hasFocus
+      ) {
         startInterval();
       }
     };
 
-    swapCards();
-    startInterval();
+    const visibilityTarget = visibilityTargetRef.current;
+
+    if (!visibilityTarget) {
+      throw new Error("Card Swap visibility target was not mounted.");
+    }
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isProjectSectionVisibleRef.current = entry.isIntersecting;
+
+        if (isProjectSectionVisibleRef.current) {
+          resumeAnimation();
+          return;
+        }
+
+        pauseAnimation();
+      },
+      { threshold: 0 },
+    );
+
+    visibilityObserver.observe(visibilityTarget);
     container.addEventListener("mouseenter", pauseAnimation);
     container.addEventListener("mouseleave", resumeAnimation);
     container.addEventListener("focusin", pauseAnimation);
@@ -317,6 +357,8 @@ export const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>((props, ref) =
     return () => {
       activateCardRef.current = () => undefined;
       restartIntervalRef.current = () => undefined;
+      isProjectSectionVisibleRef.current = false;
+      visibilityObserver.disconnect();
       container.removeEventListener("mouseenter", pauseAnimation);
       container.removeEventListener("mouseleave", resumeAnimation);
       container.removeEventListener("focusin", pauseAnimation);
@@ -333,6 +375,7 @@ export const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>((props, ref) =
     onActiveCardChange,
     skewAmount,
     verticalDistance,
+    visibilityTargetRef,
   ]);
 
   return (

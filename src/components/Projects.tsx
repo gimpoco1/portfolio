@@ -7,6 +7,7 @@ import { FeatureCard, FeatureHeader, PillLabel } from "./CommonStyles";
 export const Projects = () => {
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
   const cardSwapRef = useRef<CardSwapHandle>(null);
+  const projectsSectionRef = useRef<HTMLElement>(null);
   const activeProject = projects[activeProjectIndex];
   const handleActiveProjectChange = useCallback((index: number) => {
     setActiveProjectIndex(index);
@@ -25,7 +26,7 @@ export const Projects = () => {
   }, []);
 
   return (
-    <ProjectsSection id="projects">
+    <ProjectsSection ref={projectsSectionRef} id="projects">
       <ProjectsCopy>
         <ProjectsFeatureHeader>
           <ProjectsPillLabel>Selected Projects</ProjectsPillLabel>
@@ -76,8 +77,9 @@ export const Projects = () => {
             height={390}
             cardDistance={28}
             verticalDistance={34}
-            delay={4600}
+            delay={4000}
             skewAmount={4}
+            visibilityTargetRef={projectsSectionRef}
             onActiveCardChange={handleActiveProjectChange}
           >
             {projects.map((project, index) => (
